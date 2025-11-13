@@ -5,7 +5,6 @@ export default function NotificationsPanel() {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // каждые 5 секунд обновляем уведомления
     useEffect(() => {
         const fetchNotifications = async () => {
             setLoading(true);
