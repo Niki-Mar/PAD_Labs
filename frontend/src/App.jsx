@@ -12,7 +12,6 @@ export default function App() {
   const [selectedReceiver, setSelectedReceiver] = useState("");
   const [amount, setAmount] = useState("");
 
-  // 🔄 Автообновление уведомлений с сервера
   useEffect(() => {
     const loadNotifications = async () => {
       try {
@@ -28,7 +27,6 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // 👤 Создать пользователя
   const createUser = async () => {
     const id = users.length + 1;
     const name = `User_${id}`;
@@ -48,7 +46,6 @@ export default function App() {
     }
   };
 
-  // 💸 Отправить платёж
   const sendPayment = async () => {
     if (!selectedSender || !selectedReceiver || !amount) {
       alert("Заполни все поля!");
@@ -68,7 +65,6 @@ export default function App() {
 
       const data = await res.json();
       if (data.status === "queued") {
-        // Обновляем баланс и историю
         setUsers((users) =>
           users.map((u) => {
             if (u.name === selectedSender) {
@@ -95,7 +91,6 @@ export default function App() {
           })
         );
 
-        // Локальные уведомления обеим сторонам
         setLocalNotifications((n) => [
           ...n,
           { message: `💸 ${selectedSender} → ${selectedReceiver}: ${amount}` },
@@ -112,7 +107,6 @@ export default function App() {
     }
   };
 
-  // 🩺 Проверить состояние Gateway
   const checkHealth = async () => {
     try {
       const res = await fetch(`${API}/health`);
@@ -135,7 +129,6 @@ export default function App() {
     <div className="p-8 min-h-screen bg-gray-50 text-gray-900">
       <h1 className="text-3xl font-bold mb-4">🏦 BankMQ Dashboard</h1>
 
-      {/* 🔹 Кнопка создания пользователя */}
       <button
         onClick={createUser}
         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
@@ -143,7 +136,6 @@ export default function App() {
         + Create User
       </button>
 
-      {/* 🔹 Карточки пользователей */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         {users.map((u) => (
           <div key={u.name} className="p-4 bg-white rounded shadow">
@@ -159,7 +151,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* Мини история */}
             {u.history.length > 0 && (
               <div className="mt-3 border-t pt-2 text-sm">
                 <p className="font-semibold mb-1">📜 History:</p>
@@ -176,7 +167,6 @@ export default function App() {
         ))}
       </div>
 
-      {/* 🔹 Модалка перевода */}
       {selectedSender && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow p-6 w-80">
@@ -230,7 +220,6 @@ export default function App() {
         </div>
       )}
 
-      {/* 🔹 Notifications */}
       <div className="mt-10 border-t pt-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-bold text-lg">📢 Notifications</h2>
