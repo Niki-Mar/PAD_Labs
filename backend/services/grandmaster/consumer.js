@@ -4,10 +4,8 @@ import { connectMongo } from '../../lib/mongo.js';
 import mongoose from 'mongoose';
 
 (async () => {
-    // подключаем Mongo
     await connectMongo();
 
-    // создаём модель для уведомлений
     const notificationSchema = new mongoose.Schema({
         user: String,
         message: String,
@@ -15,7 +13,6 @@ import mongoose from 'mongoose';
     });
     const Notification = mongoose.model('Notification', notificationSchema);
 
-    // подключаем RabbitMQ
     const ch = await createChannel();
     const inQueue = 'grandmaster_queue';
     const outQueue = 'response_queue';
@@ -24,7 +21,6 @@ import mongoose from 'mongoose';
     await ch.assertQueue(outQueue);
     console.log('[GrandMasterService] waiting for messages...');
 
-    // слушаем очередь
     ch.consume(inQueue, async (msg) => {
         if (!msg) return;
         const data = JSON.parse(msg.content.toString());
@@ -32,7 +28,6 @@ import mongoose from 'mongoose';
         console.log('[GrandMasterService] received request for user:', user_id);
 
         try {
-            // 1️⃣ Получаем данные из PostgreSQL
             const sql = `
         SELECT u.name, a.balance
         FROM core.users u
@@ -52,13 +47,11 @@ import mongoose from 'mongoose';
 
             const user = sqlRes.rows[0];
 
-            // 2️⃣ Получаем уведомления из MongoDB
             const notifs = await Notification.find({ user: user_id })
                 .sort({ createdAt: -1 })
                 .limit(10)
                 .lean();
 
-            // 3️⃣ Формируем ответ
             const response = {
                 user: user.name,
                 balance: Number(user.balance),
@@ -66,7 +59,6 @@ import mongoose from 'mongoose';
                 lastUpdated: new Date().toISOString()
             };
 
-            // 4️⃣ Отправляем ответ в очередь
             ch.sendToQueue(outQueue, Buffer.from(JSON.stringify(response)));
             console.log(`[GrandMasterService] sent aggregated data for ${user_id}`);
             ch.ack(msg);
