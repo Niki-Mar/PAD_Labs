@@ -26,7 +26,6 @@ import { pool } from '../../lib/postgres.js';
         try {
             await client.query('BEGIN');
 
-            // Получаем аккаунты
             const fromAcc = await client.query(
                 `SELECT a.id, a.balance FROM core.accounts a 
          JOIN core.users u ON u.id = a.user_id WHERE u.external_id = $1`,
@@ -49,7 +48,6 @@ import { pool } from '../../lib/postgres.js';
                 throw new Error(`insufficient funds: ${from} has ${fromBalance}`);
             }
 
-            // Обновляем балансы
             await client.query(
                 `UPDATE core.accounts SET balance = $1 WHERE id = $2`,
                 [fromBalance - amount, fromAcc.rows[0].id]
@@ -59,7 +57,6 @@ import { pool } from '../../lib/postgres.js';
                 [toBalance + amount, toAcc.rows[0].id]
             );
 
-            // Записываем транзакцию
             await client.query(
                 `INSERT INTO core.transactions (from_account_id, to_account_id, amount)
          VALUES ($1, $2, $3)`,
@@ -70,7 +67,6 @@ import { pool } from '../../lib/postgres.js';
 
             console.log(`[PaymentService] transfer completed: ${from} -> ${to} (${amount}$)`);
 
-            // Уведомление
             const notif = {
                 user: to,
                 message: `You received ${amount}$ from ${from}`,
