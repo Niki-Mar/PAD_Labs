@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: bankmq-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: bankuser
+      POSTGRES_PASSWORD: bankpass
+      POSTGRES_DB: bankdb
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  mongo:
+    image: mongo:7
+    container_name: bankmq-mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: bankadmin
+      MONGO_INITDB_ROOT_PASSWORD: banksecret
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: bankmq-rabbit
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: bankmq-backend
+    restart: always
+    env_file: .env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+    ports:
+      - "3000:3000"
+    command: npm run dev:all
+    volumes:
+      - ./backend:/usr/src/app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bankmq-frontend
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://backend:3000
+    ports:
+      - "5173:5173"
+
+volumes:
+  pg_data:
+  mongo_data:

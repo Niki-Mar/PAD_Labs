@@ -1,0 +1,26 @@
+{
+  "name": "bankmq-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev:gateway": "nodemon gateway/index.js",
+    "dev:user": "nodemon services/user/consumer.js",
+    "dev:payment": "nodemon services/payment/consumer.js",
+    "dev:notification": "nodemon services/notification/consumer.js",
+    "dev:logger": "nodemon services/logger/consumer.js",
+    "dev:gm": "nodemon services/grandmaster/consumer.js",
+    "dev:all": "concurrently -n GW,USER,PAY,NOTIF,LOG,GM -c auto \"npm:dev:gateway\" \"npm:dev:user\" \"npm:dev:payment\" \"npm:dev:notification\" \"npm:dev:logger\" \"npm:dev:gm\""
+  },
+  "dependencies": {
+    "amqplib": "^0.10.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.6.3",
+    "pg": "^8.11.5"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "nodemon": "^3.1.0"
+  }
+}

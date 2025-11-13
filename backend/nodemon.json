@@ -1,0 +1,12 @@
+{
+    "watch": [
+        "gateway",
+        "services",
+        "lib",
+        "../.env"
+    ],
+    "ext": "js,json",
+    "ignore": [
+        "node_modules"
+    ]
+}
