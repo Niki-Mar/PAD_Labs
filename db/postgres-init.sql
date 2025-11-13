@@ -1,4 +1,3 @@
--- создаём схемы и таблицы
 CREATE SCHEMA IF NOT EXISTS core;
 
 CREATE TABLE IF NOT EXISTS core.users (
@@ -25,7 +24,6 @@ CREATE TABLE IF NOT EXISTS core.transactions (
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- сид-данные (по желанию)
 INSERT INTO core.users (external_id, name)
 VALUES ('u1', 'Alice'), ('u2', 'Bob')
 ON CONFLICT (external_id) DO NOTHING;
