@@ -53,7 +53,6 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
-// 💸 Mock payment endpoint
 app.post('/api/payment', (req, res) => {
   const { from, to, amount } = req.body;
   if (!from || !to || !amount) {
@@ -62,7 +61,6 @@ app.post('/api/payment', (req, res) => {
 
   console.log(`[Gateway] Payment received: ${from} -> ${to}, amount: ${amount}`);
 
-  // временный ответ для UI
   res.json({
     status: 'queued',
     transaction: { from, to, amount },
@@ -92,20 +90,4 @@ app.post('/user/report', async (req, res) => {
 
     const response = await responsePromise;
     res.json(response);
-
-    // app.get("/api/notifications", async (req, res) => {
-    //     try {
-    //         const collection = mongo.collection("notifications");
-    //         const items = await collection
-    //             .find({})
-    //             .sort({ timestamp: -1 })
-    //             .limit(50)
-    //             .toArray();
-    //         res.json(items);
-    //     } catch (err) {
-    //         console.error("Error fetching notifications:", err);
-    //         res.status(500).json({ error: "Failed to fetch notifications" });
-    //     }
-    // });
-
 });
