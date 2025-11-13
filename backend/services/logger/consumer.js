@@ -3,10 +3,8 @@ import { connectMongo } from '../../lib/mongo.js';
 import mongoose from 'mongoose';
 
 (async () => {
-    // подключаем Mongo
     await connectMongo();
 
-    // создаём модель лога
     const logSchema = new mongoose.Schema({
         service: String,
         type: String,
@@ -16,7 +14,6 @@ import mongoose from 'mongoose';
     });
     const Log = mongoose.model('Log', logSchema);
 
-    // подключаем RabbitMQ
     const ch = await createChannel();
     const queue = 'log_queue';
     await ch.assertQueue(queue);
